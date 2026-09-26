@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useState } from "react"
+import Header from "./components/header";
 
 function App() {
+  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(
+    {
+      user_id: "",
+      user_name: "Vatsal",
+      user_email: "sejpalvatsal@gmail.com",
+      user_username: "vatsal123"
+    }
+  );
 
   return (
-    <h1>Hello There</h1>
+    <>
+      <Header name={isLogin && user ? user.user_name : "User"} isLogin={isLogin} />
+    </>
   )
 }
 
