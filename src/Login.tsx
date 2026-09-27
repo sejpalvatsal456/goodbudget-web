@@ -1,23 +1,42 @@
 import { useState, type FormEvent } from "react";
+import { useAuth } from "./components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
+
   const handleSubmit = async(e: FormEvent) => {
     e.preventDefault();
     const API_URL = import.meta.env.VITE_API_URL;
     // console.log(username, password);
-    const res = await fetch(`${API_URL}/test`, {
-      method: "GET"
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      credentials: "include",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({identifier: username, password: password})
     });
-    console.log(await res.json());
+
+    const data = await res.json();
+
+    if(!res.ok) {
+      alert(data.msg);
+      return;
+    }
+    
+    const { user, accessToken } = data;
+    setAuth(accessToken, user);
+    navigate('/');
+    // console.log(await res.json());
   }
 
   return (
     <div className="bg-[#e0e5ec] w-[100vw] h-[100vh] flex justify-center items-center">
-      <div className=" bg-[#e0e5ec] p-8 w-[50vw] min-h-[50vh] rounded-2xl shadow-[5px_5px_10px_#bebebe,-5px_-5px_10px_#ffffff]">
+      <div className=" bg-[#e0e5ec] p-8 w-[80vw] md:w-[30vw] sm:w-[50vw] min-h-[50vh] rounded-2xl shadow-[5px_5px_10px_#bebebe,-5px_-5px_10px_#ffffff]">
         <h1 className="text-center text-2xl mb-10 font-semibold">Login</h1>
 
         {/* Neumorphic Input */}
