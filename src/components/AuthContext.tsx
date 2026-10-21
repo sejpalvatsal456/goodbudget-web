@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-type User = {
+export type User = {
   user_id: string;
   user_name: string;
   user_email: string;
@@ -22,6 +22,8 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
   
   const setAuth = (accessToken: string, user: User) => {
     setUser(user);
+    console.log("User inside the setAuth: " );
+    console.log(user);
     setAccessToken(accessToken);
   };
 
