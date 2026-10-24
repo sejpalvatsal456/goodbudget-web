@@ -69,8 +69,15 @@ export default function Login({ onSuccess }: LoginProps) {
       // Adjust the route and field names to match your Express auth controller.
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: identifier.trim(), password }),
+        headers: {
+          "Content-Type": "application/json",
+          "X-Client-Type": "web",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          identifier: identifier.trim(),
+          password,
+        }),
       });
       const data = (await res
         .json()
@@ -79,17 +86,6 @@ export default function Login({ onSuccess }: LoginProps) {
       if (!res.ok || !data?.accessToken || !data.user) {
         throw new Error(
           data?.msg ?? "Login failed. Check your details and try again.",
-        );
-      }
-
-      // Access token lives in memory (AuthProvider). The refresh token is persisted
-      // so the session can be restored after a reload.
-      localStorage.removeItem("refreshToken");
-      sessionStorage.removeItem("refreshToken");
-      if (data.refreshToken) {
-        (remember ? localStorage : sessionStorage).setItem(
-          "refreshToken",
-          data.refreshToken,
         );
       }
 

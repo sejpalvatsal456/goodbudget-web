@@ -261,10 +261,24 @@ function BudgetCta() {
 /* ----------------------------------- App ---------------------------------- */
 
 export default function App() {
-  const { user } = useAuth();
-  console.log(user)
+  const { user, isInitializing } = useAuth();
+
   const [active, setActive] = useState("Home");
   const name = user?.user_name ?? "there";
+
+  if (isInitializing) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Restoring your session...
+      </div>
+    );
+  }
+
+  if (!user) {
+    console.log("No user");
+  } else {
+    console.log(user);
+  }
 
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">
