@@ -21,7 +21,8 @@ type ResponseType = {
 export const useAccount = () => {
   const { user, apiFetch, isInitializing } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingAccounts, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const parseAccount = (account: ApiAccount): Account => {
     const isCash = account.acc_type == "cash";
@@ -43,14 +44,14 @@ export const useAccount = () => {
       const res = await apiFetch("/accounts");
       const data: ResponseType = await res.json();
       if (!res.ok) {
-        console.log(data.msg);
+        setError(data.msg);
         return;
       }
-      console.log(data);
       const accounts = data.result.map((acc, _) => parseAccount(acc));
       setAccounts(accounts);
+      setError(null);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,8 @@ export const useAccount = () => {
   }, [apiFetch, user, isInitializing]);
 
   return {
-    loading,
+    loadingAccounts,
     accounts,
+    error
   };
 };

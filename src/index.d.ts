@@ -17,11 +17,9 @@ type Account = {
 
 type Transaction = {
   id: string;
-  category: string;
+  category: string | null;
   merchant: string;
   amount: number; // negative = expense, positive = income
   when: string;
-  status: "Pending" | "Completed";
-  icon: LucideIcon;
-  tint: string;
+  status: string;
 };
