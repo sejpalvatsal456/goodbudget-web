@@ -1,3 +1,5 @@
+import type { Transaction } from "../../types/types";
+
 export const StatusPill = ({ status }: { status: Transaction["status"] }) => {
   return (
     <span

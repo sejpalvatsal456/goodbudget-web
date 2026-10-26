@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { inr } from "../utils/utils";
 import { StatusPill } from "./ui/StatusPill";
+import type { Transaction } from "../types/types";
 
 export const RecentTransactions = ({ items }: { items: Transaction[] }) => {
   return (

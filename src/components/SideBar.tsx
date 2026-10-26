@@ -1,15 +1,17 @@
 import { ArrowLeftRight, Home, PieChart, Settings, Wallet, type LucideIcon } from "lucide-react";
 import Logo from "./Logo";
+import { useNavigate } from "react-router-dom";
 
-const NAV: { label: string; icon: LucideIcon }[] = [
-  { label: "Home", icon: Home },
-  { label: "Accounts", icon: Wallet },
-  { label: "Transactions", icon: ArrowLeftRight },
-  { label: "Summary", icon: PieChart },
-  { label: "Settings", icon: Settings },
+const NAV: { label: string; icon: LucideIcon, destination: string }[] = [
+  { label: "Home", icon: Home, destination: '/' },
+  { label: "Accounts", icon: Wallet, destination: "/accounts" },
+  { label: "Transactions", icon: ArrowLeftRight, destination: "/transactions" },
+  { label: "Summary", icon: PieChart, destination: "/summary" },
+  { label: "Settings", icon: Settings, destination: "/settings" },
 ];
 
 function SidebarArt() {
+
   return (
     <div className="mt-auto flex flex-col items-center pt-8 text-center">
       <svg viewBox="0 0 140 110" className="w-25.5" aria-hidden="true">
@@ -32,18 +34,22 @@ function SidebarArt() {
 }
 
 export const Sidebar = ({ active, onChange }: { active: string; onChange: (l: string) => void }) => {
+  const navigate = useNavigate();
   return (
     <aside className="sticky top-0 hidden h-screen w-[206px] shrink-0 flex-col border-r border-line bg-white px-4 py-5.5 lg:flex">
       <div className="px-1">
         <Logo />
       </div>
       <nav className="mt-8 flex flex-col gap-1.5" aria-label="Main">
-        {NAV.map(({ label, icon: Icon }) => {
+        {NAV.map(({ label, icon: Icon, destination }) => {
           const isActive = active === label;
           return (
             <button
               key={label}
-              onClick={() => onChange(label)}
+              onClick={() => {
+                navigate(destination)
+                onChange(label)
+              }}
               aria-current={isActive ? "page" : undefined}
               className={`flex h-[40px] items-center gap-3 rounded-xl px-3 text-[13px] transition ${
                 isActive

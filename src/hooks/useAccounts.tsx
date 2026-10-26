@@ -35,6 +35,7 @@ export const useAccount = () => {
       kind: isCash ? "cash" : "bank",
       icon: isCash ? Wallet : Landmark,
       color: isCash ? "bg-coral" : "bg-sky-500",
+      isDisabled: account.acc_is_disabled
     };
   };
 

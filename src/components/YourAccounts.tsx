@@ -1,5 +1,6 @@
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { inr } from "../utils/utils";
+import type { Account } from "../types/types";
 
 export const YourAccounts = ({ accounts }: { accounts: Account[] }) => {
   return (

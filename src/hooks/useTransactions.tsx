@@ -15,7 +15,8 @@ type ApiTransaction = {
   created_at: string,
   updated_at: string,
   deleted_at: string | null,
-  cat_id: string | null
+  cat_id: string | null,
+  cat_name: string | null
 };
 
 type ResponseType = {
@@ -32,7 +33,7 @@ export const useTransactions = () => {
   const mapTransaction = (tran: ApiTransaction): Transaction => {
     return {
       id: tran.tran_id,
-      category: tran.cat_id,
+      category: tran.cat_name,
       merchant: tran.tran_merchant,
       amount: (tran.tran_type === "income" ? +1 : -1) * Number(tran.tran_amount), // negative = expense, positive = income
       when: (new Date(tran.created_at)).toDateString(),
