@@ -6,5 +6,8 @@
 		{
 			"path": "../goodbudget-backend"
 		}
-	]
+	],
+	"settings": {
+		"todo-tree.tree.showBadges": true
+	}
 }

@@ -1,8 +1,9 @@
 import { Landmark, UserIcon, Wallet } from "lucide-react";
 import { inr } from "../utils/utils";
+import type { Account } from "../types/types";
 
 export const BalanceCard = ({ accounts }: { accounts: Account[] }) => {
-  const total = accounts.reduce((sum, a) => sum + a.balance, 0);
+  const total = accounts.filter(a => !a.isDisabled).reduce((sum, a) => sum + a.balance, 0);
   const cash = accounts.filter((a) => a.kind === "cash").length;
   const bank = accounts.filter((a) => a.kind === "bank").length;
 

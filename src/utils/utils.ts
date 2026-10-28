@@ -17,4 +17,4 @@ export const initials = (name: string) =>
     .slice(0, 2)
     .toUpperCase();
 
-export const groupOf = (a: Account) => GROUPS.find((g) => g.types.includes(a.type)) ?? GROUPS[0];
+export const groupOf = (a: Account) => GROUPS.find((g) => g.types.includes(a.type.toLowerCase())) ?? GROUPS[0];

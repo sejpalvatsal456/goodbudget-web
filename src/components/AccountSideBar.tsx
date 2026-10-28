@@ -1,6 +1,5 @@
-import { ArrowDown, ArrowUp, BarChart3, FileText, Plus } from "lucide-react";
+import { BarChart3, FileText, Plus } from "lucide-react";
 import type { Activity } from "../types/types";
-import { inr } from "../utils/utils";
 import { IconBubble } from "./ui/IconBubble";
 import type { HTMLAttributes } from "react";
 
@@ -10,7 +9,7 @@ const actions = [
 ];
 
 interface Props {
-  activity: Activity[];
+  activity?: Activity[];
   onAdd: () => void;
 }
 
@@ -35,7 +34,7 @@ export const AccountSidebar = ({ activity, onAdd }: Props) => (
         ))}
       </div>
     </Card>
-
+{/* 
     <Card>
       <h2 className="mb-3 text-sm font-semibold">Recent Activity</h2>
       <ul className="space-y-3.5">
@@ -59,6 +58,6 @@ export const AccountSidebar = ({ activity, onAdd }: Props) => (
           );
         })}
       </ul>
-    </Card>
+    </Card> */}
   </>
 );
