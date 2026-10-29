@@ -37,5 +37,6 @@ export type Transaction = {
   merchant: string;
   amount: number; // negative = expense, positive = income
   when: string;
+  type: 'income' | 'expense'
   status: string;
 };

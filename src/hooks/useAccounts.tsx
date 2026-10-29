@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthContext";
 import { Landmark, Wallet } from "lucide-react";
+import type { Account } from "../types/types";
 
 type ApiAccount = {
   acc_id: string;

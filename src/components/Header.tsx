@@ -9,7 +9,6 @@ export const Header = ({ name }: { name: string }) => {
         <div className="mb-2.5 lg:hidden">
           <Logo />
         </div>
-        <p className="text-base text-muted">{greeting()}</p>
         <h1 className="flex items-center gap-2.5 text-4xl font-bold tracking-tight">
           {name} <span aria-hidden="true">👋</span>
         </h1>

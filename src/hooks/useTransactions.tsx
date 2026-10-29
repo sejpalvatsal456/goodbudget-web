@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthContext";
+import type { Transaction } from "../types/types";
 
 type ApiTransaction = {
   tran_id: string,
@@ -26,7 +27,7 @@ type ResponseType = {
 
 export const useTransactions = () => {
   const { user, isInitializing, apiFetch } = useAuth();
-  const [tranactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingTransactions, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +38,8 @@ export const useTransactions = () => {
       merchant: tran.tran_merchant,
       amount: (tran.tran_type === "income" ? +1 : -1) * Number(tran.tran_amount), // negative = expense, positive = income
       when: (new Date(tran.created_at)).toDateString(),
-      status: tran.tran_type,
+      status: tran.tran_status,
+      type: tran.tran_type,
     }
   }
 
@@ -67,7 +69,7 @@ export const useTransactions = () => {
   }, [apiFetch, user, isInitializing]);
 
   return {
-    tranactions,
+    transactions,
     loadingTransactions,
     error
   };

@@ -18,10 +18,10 @@ import { useTransactions } from "./hooks/useTransactions";
 export default function App() {
   const { user, isInitializing, apiFetch } = useAuth();
   const { loadingAccounts, accounts } = useAccount();
-  const { loadingTransactions, tranactions } = useTransactions();
+  const { loadingTransactions, transactions } = useTransactions();
 
   if(!loadingTransactions) {
-    console.log(tranactions);
+    console.log(transactions);
   }
 
   const [active, setActive] = useState("Home");
@@ -66,7 +66,7 @@ export default function App() {
         <div className="mt-6.5 grid gap-6.5 xl:grid-cols-[minmax(0,1fr)_346px]">
           <div>
             <BalanceCard accounts={loadingAccounts ? [] : accounts} />
-            <RecentTransactions items={loadingTransactions ? [] : tranactions} />
+            <RecentTransactions items={loadingTransactions ? [] : transactions} />
           </div>
 
           <div>

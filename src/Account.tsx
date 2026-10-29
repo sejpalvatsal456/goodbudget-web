@@ -4,7 +4,7 @@ import { AccountsHeader } from "./components/AccountsHeader";
 import { AccountSidebar } from "./components/AccountSideBar";
 import { BalanceCard } from "./components/BalanceCard";
 import { GROUPS } from "./constants/constant";
-import type { Account, Activity } from "./types/types";
+import type { Account } from "./types/types";
 import { groupOf } from "./utils/utils";
 import { AccountFilters, defaultFilters } from "./components/AccountFilter";
 import { AccountDrawer } from "./components/AccountDrawer";
@@ -68,8 +68,8 @@ import { useAuth } from "./components/AuthContext";
 //   },
 // ];
 
-// [ ]: The current UI has three different sections for accounts
-// Make it to two - active and disabled
+// [ ]: The current UI has three different sections for accounts - Make it to two - active and disabled
+// [ ]: Make it mobile responsive
 
 export const AccountPage = () => {
   const [active, setActive] = useState<string>("Accounts");

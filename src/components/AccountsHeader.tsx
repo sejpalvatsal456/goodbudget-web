@@ -19,7 +19,7 @@ export const AccountsHeader = ({ name, query, onQueryChange }: Props) => (
     </div>
 
     <div className="flex w-full items-center gap-3 sm:w-auto">
-      <label className="flex h-9.5 flex-1 items-center gap-2.5 rounded-xl bg-[#f6f6f9] px-3 text-muted sm:w-[240px] sm:flex-none">
+      {/* <label className="flex h-9.5 flex-1 items-center gap-2.5 rounded-xl bg-[#f6f6f9] px-3 text-muted sm:w-[240px] sm:flex-none">
         <Search size={16} />
         <input
           type="search"
@@ -28,10 +28,10 @@ export const AccountsHeader = ({ name, query, onQueryChange }: Props) => (
           placeholder="Search accounts..."
           className="w-full bg-transparent text-xs text-ink outline-none placeholder:text-muted"
         />
-      </label>
-      <button className="text-ink/70" aria-label="Filters">
+      </label> */}
+      {/* <button className="text-ink/70" aria-label="Filters">
         <SlidersHorizontal size={18} strokeWidth={1.6} />
-      </button>
+      </button> */}
       <button className="flex items-center gap-1.5" aria-label="Account menu">
         <span className="grid size-9 place-items-center rounded-full bg-coral/15 text-xs font-medium text-coral">
           {initials(name)}
