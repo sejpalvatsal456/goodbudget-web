@@ -30,6 +30,8 @@ export type StatusFilter = "all" | "active" | "disabled";
 export type TypeFilter = "all" | AccountGroupKey;
 export type SortKey = "balance" | "name";
 
+export const TransactionTypeValues = ['income', 'expense'] as const;
+export const TransactionStatusValues = ['completed', 'pending', 'failed'] as const;
 
 export type Transaction = {
   id: string;
@@ -37,6 +39,6 @@ export type Transaction = {
   merchant: string;
   amount: number; // negative = expense, positive = income
   when: string;
-  type: 'income' | 'expense'
-  status: string;
+  type: typeof TransactionTypeValues[number];
+  status: typeof TransactionStatusValues[number]
 };

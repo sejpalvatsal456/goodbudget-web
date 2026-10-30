@@ -1,28 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./components/SideBar";
 import { initials, inr } from "./utils/utils";
 import {
   ArrowBigDown,
   ArrowBigUp,
   ArrowLeftRight,
-  ChevronDown,
+  ChevronDown
 } from "lucide-react";
 import Logo from "./components/Logo";
-import type { Transaction } from "./types/types";
-import { IconBubble } from "./components/ui/IconBubble";
+import { TransactionStatusValues, type Transaction } from "./types/types";
 import { useTransactions } from "./hooks/useTransactions";
+import { defaultFilter, TransactionFilter } from "./components/transactions/TransactionFilter";
 
 interface TransactionsHeaderProps {
   name: string;
-  query?: string;
-  onQueryChange?: (value: string) => void;
 }
 
-export const TransactionsHeader = ({
-  name,
-  query,
-  onQueryChange,
-}: TransactionsHeaderProps) => (
+export const TransactionsHeader = ({ name }: TransactionsHeaderProps) => (
   <header className="flex flex-wrap items-start justify-between gap-3">
     <div>
       <div className="mb-2.5 lg:hidden">
@@ -56,6 +50,7 @@ const TransactionCard = ({ transactions }: TransactionCardProps) => {
     .reduce((amount, tran) => {
       return amount + tran.amount;
     }, 0);
+
   const totalExpense = transactions
     .filter((t) => t.type === "expense")
     .reduce((total, tran) => {
@@ -104,9 +99,18 @@ const TransactionCard = ({ transactions }: TransactionCardProps) => {
   );
 };
 
+
+
 const TransactionPage = () => {
   const [active, setActive] = useState<string>("Transactions");
+  const [filters, setFilters] = useState(defaultFilter);
   const { transactions, loadingTransactions } = useTransactions();
+
+  console.log(TransactionStatusValues)
+
+  useEffect(() => {
+    console.log(filters);
+  }, [filters]);
 
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">
@@ -117,6 +121,12 @@ const TransactionPage = () => {
           <div className="space-y-4">
             <TransactionCard
               transactions={loadingTransactions ? [] : transactions}
+            />
+            <TransactionFilter
+              filters={filters}
+              onChange={setFilters}
+              // onAdd={() => openAdd()}
+              onAdd={() => {}}
             />
           </div>
         </div>
