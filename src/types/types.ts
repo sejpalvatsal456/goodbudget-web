@@ -39,6 +39,7 @@ export type Transaction = {
   merchant: string;
   amount: number; // negative = expense, positive = income
   when: string;
+  acc_id: string;
   type: typeof TransactionTypeValues[number];
   status: typeof TransactionStatusValues[number]
 };

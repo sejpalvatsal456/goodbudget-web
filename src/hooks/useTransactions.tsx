@@ -5,7 +5,7 @@ import type { Transaction } from "../types/types";
 type ApiTransaction = {
   tran_id: string,
   trans_desc: string,
-  tran_status: "pending" | "completed" | "failed",
+  tran_status: "pending" | "success" | "failed",
   user_id: string,
   account_id: string,
   tran_merchant: string,
@@ -37,6 +37,7 @@ export const useTransactions = () => {
       category: tran.cat_name,
       merchant: tran.tran_merchant,
       amount: (tran.tran_type === "income" ? +1 : -1) * Number(tran.tran_amount), // negative = expense, positive = income
+      acc_id: tran.account_id,
       when: (new Date(tran.created_at)).toDateString(),
       status: tran.tran_status,
       type: tran.tran_type,
