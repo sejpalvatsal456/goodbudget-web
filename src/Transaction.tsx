@@ -11,6 +11,10 @@ import Logo from "./components/Logo";
 import { TransactionStatusValues, type Transaction } from "./types/types";
 import { useTransactions } from "./hooks/useTransactions";
 import { defaultFilter, TransactionFilter } from "./components/transactions/TransactionFilter";
+import { useAuth } from "./components/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+// TODO: Clean this shit
 
 interface TransactionsHeaderProps {
   name: string;
@@ -105,8 +109,16 @@ const TransactionPage = () => {
   const [active, setActive] = useState<string>("Transactions");
   const [filters, setFilters] = useState(defaultFilter);
   const { transactions, loadingTransactions } = useTransactions();
+  const { isInitializing, statusCode } = useAuth();
+  const navigate = useNavigate();
 
-  console.log(TransactionStatusValues)
+  // console.log(TransactionStatusValues)
+
+  useEffect(() => {
+    if(statusCode === 401) {
+      navigate("/login?callback=/transactions");
+    }
+  }, [isInitializing])
 
   useEffect(() => {
     console.log(filters);

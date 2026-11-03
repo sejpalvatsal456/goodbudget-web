@@ -25,6 +25,7 @@ type AuthContextType = {
   setAuth: (accessToken: string, user: User) => void;
   clearAuth: () => void;
   apiFetch: (path: string, options?: RequestInit) => Promise<Response>;
+  statusCode: number | null
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [statusCode, setStatusCode] = useState<number | null>(null);
 
   // Share one refresh request across concurrent API calls.
   const refreshPromise = useRef<Promise<string | null> | null>(null);
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           method: "POST",
           credentials: "include",
         });
-
+        setStatusCode(response.status);
         if (!response.ok) {
           clearAuth();
           return;
@@ -94,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           method: "POST",
           credentials: "include",
         });
+        setStatusCode(response.status);
 
         if (!response.ok) {
           clearAuth();
@@ -185,6 +188,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAuth,
         clearAuth,
         apiFetch,
+        statusCode
       }}
     >
       {children}

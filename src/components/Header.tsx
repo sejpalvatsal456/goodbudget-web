@@ -1,6 +1,6 @@
 import { Search, Bell, ChevronDown } from "lucide-react";
 import Logo from "./Logo";
-import { greeting, initials } from "../utils/utils";
+import { initials } from "../utils/utils";
 
 export const Header = ({ name }: { name: string }) => {
   return (

@@ -11,23 +11,24 @@ import { YourAccounts } from "./components/YourAccounts";
 import { BudgetCta } from "./components/BudgetCta";
 import { useAccount } from "./hooks/useAccounts";
 import { useTransactions } from "./hooks/useTransactions";
+import { useNavigate } from "react-router-dom";
 
 /* ------------------------------- Sample data ------------------------------- */
 // Replace these with data from your API.
 
 export default function App() {
-  const { user, isInitializing, apiFetch } = useAuth();
+  const { user, isInitializing, apiFetch, statusCode } = useAuth();
   const { loadingAccounts, accounts } = useAccount();
   const { loadingTransactions, transactions } = useTransactions();
-
-  if(!loadingTransactions) {
-    console.log(transactions);
-  }
+  const navigate = useNavigate();
 
   const [active, setActive] = useState("Home");
   const name = user?.user_name ?? "there";
 
   useEffect(() => {
+    if(statusCode === 401) {
+      navigate("/login")
+    }
     if (isInitializing) return;
     if (!user) return;
     const getBalance = async () => {
@@ -43,7 +44,7 @@ export default function App() {
         console.log(error);
       }
     };
-
+    // console.log(statusCode);
     void getBalance();
   }, [user, apiFetch, isInitializing]);
 

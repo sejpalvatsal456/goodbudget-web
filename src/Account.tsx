@@ -11,6 +11,7 @@ import { AccountDrawer } from "./components/AccountDrawer";
 import { Sidebar } from "./components/SideBar";
 import { useAccount } from "./hooks/useAccounts";
 import { useAuth } from "./components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // export const MOCK_ACCOUNTS: Account[] = [
 //   {
@@ -77,7 +78,14 @@ export const AccountPage = () => {
   const [drawer, setDrawer] = useState<Partial<Account> | null>(null);
   const { accounts, loadingAccounts } = useAccount();
   const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
-  const { user, isInitializing, apiFetch } = useAuth();
+  const { user, isInitializing, apiFetch, statusCode } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(statusCode === 401) {
+      navigate("/login?callback=/accounts");
+    }
+  }, [user, apiFetch, isInitializing])
 
   useEffect(() => {
     if (!loadingAccounts) {

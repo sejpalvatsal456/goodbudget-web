@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import {
-  Wallet,
   Mail,
   Lock,
   Eye,
@@ -14,7 +13,7 @@ import {
 import { useAuth, type User } from "./components/AuthContext";
 import financeIllustation from "./assets/goodbudget-finance-illustration.svg";
 import Logo from "./components/Logo";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -50,10 +49,14 @@ export default function Login({ onSuccess }: LoginProps) {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(true);
+  // const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const callback = searchParams.get("callback");
+  console.log(callback);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -94,7 +97,7 @@ export default function Login({ onSuccess }: LoginProps) {
       setAuth(data.accessToken, data.user);
       onSuccess?.(data.user);
       // location.href = '/';
-      navigate('/');
+      navigate(callback || "/");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Something went wrong. Try again.",
