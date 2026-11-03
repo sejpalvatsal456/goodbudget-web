@@ -31,7 +31,7 @@ export type TypeFilter = "all" | AccountGroupKey;
 export type SortKey = "balance" | "name";
 
 export const TransactionTypeValues = ['income', 'expense'] as const;
-export const TransactionStatusValues = ['completed', 'pending', 'failed'] as const;
+export const TransactionStatusValues = ['success', 'pending', 'failed'] as const;
 
 export type Transaction = {
   id: string;
