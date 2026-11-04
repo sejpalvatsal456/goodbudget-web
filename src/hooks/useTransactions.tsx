@@ -36,7 +36,7 @@ export const useTransactions = () => {
       id: tran.tran_id,
       category: tran.cat_name,
       merchant: tran.tran_merchant,
-      amount: (tran.tran_type === "income" ? +1 : -1) * Number(tran.tran_amount), // negative = expense, positive = income
+      amount:  Number(tran.tran_amount), // negative = expense, positive = income
       acc_id: tran.account_id,
       when: (new Date(tran.created_at)).toDateString(),
       status: tran.tran_status,

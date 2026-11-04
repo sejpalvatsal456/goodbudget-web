@@ -7,7 +7,9 @@ import { useAccount } from "../../hooks/useAccounts";
 
 type Values = Omit<Transaction, "id" | "when">;
 
-// TODO: Add Category Field after category page is created  
+// TODO: Add Category Field after category page is created
+// TODO: Add Transaction Date to change
+// TODO: Add Transaction Mode
 const TransactionForm = ({
   initial,
   onSubmit,
@@ -24,14 +26,14 @@ const TransactionForm = ({
     amount: 0,
     type: "expense",
     status: "success",
-    acc_id: "",
+    acc_id: initial.acc_id || "",
     merchant: "",
     ...initial,
   });
 
   useEffect(() => {
-    if(!accounts || loadingAccounts) return;
-    setV({ ...v, acc_id: accounts[0].id  })
+    if (!accounts || loadingAccounts) return;
+    setV({ ...v, acc_id: v.acc_id === "" ? accounts[0].id : v.acc_id });
   }, [accounts]);
 
   return (
@@ -48,6 +50,8 @@ const TransactionForm = ({
           onChange={(e) =>
             setV({ ...v, type: e.target.value as Transaction["type"] })
           }
+          disabled={isEdit}
+          style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
         >
           <option value="income">Income</option>
           <option value="expense">Expense</option>
@@ -63,10 +67,14 @@ const TransactionForm = ({
       <Field label="Account">
         <SelectInput
           value={v.acc_id}
-          onChange={e => setV({ ...v, acc_id: e.target.value })}
+          onChange={(e) => setV({ ...v, acc_id: e.target.value })}
+          disabled={isEdit}
+          style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
         >
-          {accounts.map(acc => (
-            <option value={acc.id}>{acc.name}</option>
+          {accounts.map((acc, key) => (
+            <option key={key} value={acc.id}>
+              {acc.name}
+            </option>
           ))}
         </SelectInput>
       </Field>
@@ -75,7 +83,9 @@ const TransactionForm = ({
           type="number"
           value={v.amount}
           onChange={(e) => setV({ ...v, amount: parseInt(e.target.value) })}
-        />
+          disabled={isEdit}
+          style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
+        /> 
       </Field>
       <Field label="Status">
         <SelectInput
@@ -83,6 +93,8 @@ const TransactionForm = ({
           onChange={(e) =>
             setV({ ...v, status: e.target.value as Transaction["status"] })
           }
+          disabled={isEdit && v.status === "success"}
+          style={isEdit && v.status === "success" ? { backgroundColor: "#eee", color: "#888" } : {}}
         >
           <option value="success">Success</option>
           <option value="pending">Pending</option>
@@ -100,7 +112,7 @@ const TransactionForm = ({
           <Button variant="neutral" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Issue</Button>
+          <Button type="submit" disabled={loadingAccounts}>Issue</Button>
         </div>
       )}
     </form>
@@ -116,7 +128,6 @@ export const TransactionDrawer = ({
   onAdd: (value: Values) => void;
   onClose: () => void;
 }) => {
-
   useEffect(() => {
     if (!transaction) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();

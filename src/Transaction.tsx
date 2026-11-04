@@ -30,6 +30,11 @@ const TransactionPage = () => {
     }
   }, [isInitializing]);
 
+  useEffect(() => {
+    if(loadingTransactions) return;
+    console.log("Transactions from API: ")
+    console.log(transactions)
+  }, [transactions, loadingTransactions])
 
   // TODO: add filter for query field
   useEffect(() => {
@@ -48,6 +53,41 @@ const TransactionPage = () => {
     const id =  drawer?.id;
     if (id) {
       // edit mode
+      console.log("Edit Mode: ");
+      console.log(value);
+
+      const payload = {
+        tran_id: id,
+        tran_status: value.status,
+        tran_merchant: value.merchant,
+      };
+
+      const res = await apiFetch("/transactions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if(!res.ok) {
+        console.log(data.msg);
+        return;
+      }
+
+      const newTran: Transaction = { 
+        id: data.result.tran_id,
+        merchant: data.result.tran_merchant,
+        type: data.result.tran_type,
+        status: data.result.tran_status,
+        amount: Number(data.result.tran_amount),
+        acc_id: data.result.account_id,
+        category: data.result.cat_name,
+        when: (new Date(data.result.created_at)).toDateString()
+       };
+
+      setFilteredTransactions(list => list.map(t => t.id === data.result.tran_id ? newTran : t));
+      setDrawer(null);
+
     } else {
       // add mode
       const payload = {
@@ -77,12 +117,13 @@ const TransactionPage = () => {
         merchant: data.result.tran_merchant,
         type: data.result.tran_type,
         status: data.result.tran_status,
-        amount: data.result.tran_amount,
+        amount: Number(data.result.tran_amount),
         acc_id: data.result.account_id,
         category: data.result.cat_name,
         when: (new Date(data.result.created_at)).toDateString()
       }
-      setFilteredTransactions(list => [...list, newTran])
+      setFilteredTransactions(list => [...list, newTran]);
+      setDrawer(null);
     }
   };
 
@@ -108,7 +149,10 @@ const TransactionPage = () => {
                 });
               }}
             />
-            <TransactionList transactions={filteredTransactions} />
+            <TransactionList transactions={filteredTransactions} onEdit={(t: Transaction) => {
+              setDrawer(t);
+              console.log(t)
+            }} />
           </div>
           <TransactionDrawer
             transaction={drawer}
