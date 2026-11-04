@@ -127,6 +127,24 @@ const TransactionPage = () => {
     }
   };
 
+  const handledelete = async(id: string) => {
+    // console.log("Deleting id: " + id);
+    const res = await apiFetch("/transactions", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tran_id: id })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      console.log(data.msg);
+      return;
+    }
+    console.log(data);
+    setFilteredTransactions(list => list.filter(t => t.id !== id))
+    setDrawer(null);
+  }
+
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">
       <Sidebar active={active} onChange={setActive} />
@@ -158,6 +176,7 @@ const TransactionPage = () => {
             transaction={drawer}
             onAdd={handleSubmit}
             onClose={() => setDrawer(null)}
+            onDelete={handledelete}
           />
         </div>
       </div>

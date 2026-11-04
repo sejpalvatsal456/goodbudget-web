@@ -14,10 +14,12 @@ const TransactionForm = ({
   initial,
   onSubmit,
   onCancel,
+  onDelete
 }: {
   initial: Partial<Transaction>;
   onSubmit: (v: Values) => void;
   onCancel: () => void;
+  onDelete: (id: string) => void;
 }) => {
   const isEdit = !!initial.id;
   const { accounts, loadingAccounts } = useAccount();
@@ -101,8 +103,11 @@ const TransactionForm = ({
           <option value="failed">Failed</option>
         </SelectInput>
       </Field>
-      {isEdit ? (
+      {isEdit && initial.id ? (
         <div className="space-y-2 border-t border-black/5 pt-4">
+          <Button variant="outline" className="w-full" onClick={() => onDelete(initial.id || "")}>
+            Delete Transaction
+          </Button>
           <Button type="submit" className="w-full">
             Save Changes
           </Button>
@@ -123,10 +128,12 @@ export const TransactionDrawer = ({
   transaction,
   onAdd,
   onClose,
+  onDelete,
 }: {
   transaction: Partial<Transaction> | null;
   onAdd: (value: Values) => void;
   onClose: () => void;
+  onDelete: (id: string) => void;
 }) => {
   useEffect(() => {
     if (!transaction) return;
@@ -160,6 +167,7 @@ export const TransactionDrawer = ({
           initial={transaction}
           onSubmit={onAdd}
           onCancel={onClose}
+          onDelete={onDelete}
         />
       </aside>
     </div>

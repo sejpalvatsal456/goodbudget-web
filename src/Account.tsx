@@ -76,7 +76,7 @@ export const AccountPage = () => {
   const [active, setActive] = useState<string>("Accounts");
   const [filters, setFilters] = useState(defaultFilters);
   const [drawer, setDrawer] = useState<Partial<Account> | null>(null);
-  const { accounts, loadingAccounts } = useAccount();
+  const { accounts, loadingAccounts } = useAccount(true);
   const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
   const { user, isInitializing, apiFetch, statusCode } = useAuth();
   const navigate = useNavigate();

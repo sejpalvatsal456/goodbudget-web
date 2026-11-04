@@ -19,7 +19,7 @@ type ResponseType = {
   result: ApiAccount[];
 };
 
-export const useAccount = () => {
+export const useAccount = (allowDisabled?: boolean) => {
   const { user, apiFetch, isInitializing } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loadingAccounts, setLoading] = useState<boolean>(true);
@@ -43,7 +43,7 @@ export const useAccount = () => {
   const fetchAccounts = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch("/accounts");
+      const res = await apiFetch("/accounts" + (allowDisabled ? "?allowDisabled=true" : ""));
       const data: ResponseType = await res.json();
       if (!res.ok) {
         setError(data.msg);
