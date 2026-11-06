@@ -43,3 +43,9 @@ export type Transaction = {
   type: typeof TransactionTypeValues[number];
   status: typeof TransactionStatusValues[number]
 };
+
+export type Category = {
+  id: string;
+  name: string;
+  desc: string;
+}

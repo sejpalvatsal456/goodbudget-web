@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "./components/SideBar";
-import { type Transaction } from "./types/types";
+import { type Category, type Transaction } from "./types/types";
 import { useTransactions } from "./hooks/useTransactions";
 import {
   defaultFilter,
@@ -12,7 +12,7 @@ import { TransactionsHeader } from "./components/transactions/TransactionHeader"
 import { TransactionDrawer } from "./components/transactions/TransactionDrawer";
 import { TransactionCard } from "./components/transactions/TransactionCard";
 import { TransactionList } from "./components/transactions/TransactionList";
-
+import { CategoryPanel } from "./components/transactions/CategoryPanel";
 
 const TransactionPage = () => {
   const [active, setActive] = useState<string>("Transactions");
@@ -31,26 +31,26 @@ const TransactionPage = () => {
   }, [isInitializing]);
 
   useEffect(() => {
-    if(loadingTransactions) return;
-    console.log("Transactions from API: ")
-    console.log(transactions)
-  }, [transactions, loadingTransactions])
+    if (loadingTransactions) return;
+    // console.log("Transactions from API: ");
+    // console.log(transactions);
+  }, [transactions, loadingTransactions]);
 
   // TODO: add filter for query field
   useEffect(() => {
     if (loadingTransactions) return;
-    console.log(filters);
-    console.log("Filtered Transactions: ");
+    // console.log(filters);
+    // console.log("Filtered Transactions: ");
     const newTransactions = transactions
       .filter((t) => filters.status === "all" || t.status === filters.status)
       .filter((t) => filters.type === "all" || t.type === filters.type);
     setFilteredTransactions(newTransactions);
-    console.log(newTransactions);
+    // console.log(newTransactions);
   }, [filters, transactions]);
 
-  const handleSubmit = async(value: Omit<Transaction, "id" | "when">) => {
+  const handleSubmit = async (value: Omit<Transaction, "id" | "when">) => {
     // console.log(value);
-    const id =  drawer?.id;
+    const id = drawer?.id;
     if (id) {
       // edit mode
       console.log("Edit Mode: ");
@@ -65,16 +65,16 @@ const TransactionPage = () => {
       const res = await apiFetch("/transactions", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-      if(!res.ok) {
+      if (!res.ok) {
         console.log(data.msg);
         return;
       }
 
-      const newTran: Transaction = { 
+      const newTran: Transaction = {
         id: data.result.tran_id,
         merchant: data.result.tran_merchant,
         type: data.result.tran_type,
@@ -82,12 +82,13 @@ const TransactionPage = () => {
         amount: Number(data.result.tran_amount),
         acc_id: data.result.account_id,
         category: data.result.cat_name,
-        when: (new Date(data.result.created_at)).toDateString()
-       };
+        when: new Date(data.result.created_at).toDateString(),
+      };
 
-      setFilteredTransactions(list => list.map(t => t.id === data.result.tran_id ? newTran : t));
+      setFilteredTransactions((list) =>
+        list.map((t) => (t.id === data.result.tran_id ? newTran : t)),
+      );
       setDrawer(null);
-
     } else {
       // add mode
       const payload = {
@@ -95,18 +96,18 @@ const TransactionPage = () => {
         tran_status: value.status,
         tran_type: value.type,
         account_id: value.acc_id,
-        tran_amount: value.amount 
+        tran_amount: value.amount,
       };
 
       const res = await apiFetch("/transactions", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if(!res.ok) {
+      if (!res.ok) {
         console.log(data.msg);
         return;
       }
@@ -120,19 +121,19 @@ const TransactionPage = () => {
         amount: Number(data.result.tran_amount),
         acc_id: data.result.account_id,
         category: data.result.cat_name,
-        when: (new Date(data.result.created_at)).toDateString()
-      }
-      setFilteredTransactions(list => [...list, newTran]);
+        when: new Date(data.result.created_at).toDateString(),
+      };
+      setFilteredTransactions((list) => [...list, newTran]);
       setDrawer(null);
     }
   };
 
-  const handledelete = async(id: string) => {
+  const handledelete = async (id: string) => {
     // console.log("Deleting id: " + id);
     const res = await apiFetch("/transactions", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tran_id: id })
+      body: JSON.stringify({ tran_id: id }),
     });
 
     const data = await res.json();
@@ -141,9 +142,9 @@ const TransactionPage = () => {
       return;
     }
     console.log(data);
-    setFilteredTransactions(list => list.filter(t => t.id !== id))
+    setFilteredTransactions((list) => list.filter((t) => t.id !== id));
     setDrawer(null);
-  }
+  };
 
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">
@@ -167,11 +168,14 @@ const TransactionPage = () => {
                 });
               }}
             />
-            <TransactionList transactions={filteredTransactions} onEdit={(t: Transaction) => {
-              setDrawer(t);
-              console.log(t)
-            }} />
+            <TransactionList
+              transactions={filteredTransactions}
+              onEdit={(t: Transaction) => {
+                setDrawer(t);
+              }}
+            />
           </div>
+          <CategoryPanel />
           <TransactionDrawer
             transaction={drawer}
             onAdd={handleSubmit}

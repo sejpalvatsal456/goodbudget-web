@@ -51,7 +51,7 @@ export const TransactionFilter = ({
         <input
           value={filters.query}
           onChange={(e) => onChange({ ...filters, query: e.target.value })}
-          placeholder="Search by account name..."
+          placeholder="Search by transaction name and merchant..."
           className="w-full bg-transparent text-xs text-ink outline-none placeholder:text-muted"
         />
       </label>
