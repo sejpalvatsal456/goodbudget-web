@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "./components/SideBar";
-import { type Category, type Transaction } from "./types/types";
+import { type Transaction } from "./types/types";
 import { useTransactions } from "./hooks/useTransactions";
 import {
   defaultFilter,
@@ -36,12 +36,12 @@ const TransactionPage = () => {
     // console.log(transactions);
   }, [transactions, loadingTransactions]);
 
-  // TODO: add filter for query field
+  // TODO add category filter
   useEffect(() => {
     if (loadingTransactions) return;
-    // console.log(filters);
-    // console.log("Filtered Transactions: ");
+    // console.log(filters)
     const newTransactions = transactions
+      .filter(t => t.merchant.includes(filters.query) || t.category?.includes(filters.query))
       .filter((t) => filters.status === "all" || t.status === filters.status)
       .filter((t) => filters.type === "all" || t.type === filters.type);
     setFilteredTransactions(newTransactions);

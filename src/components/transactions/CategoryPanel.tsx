@@ -116,7 +116,7 @@ export const CategoryPanel = () => {
         </div>
 
         <form
-          className="flex flex-col md:w-[40%] xl:w-full gap-5"
+          className="flex flex-col md:w-[40%] xl:w-full gap-3"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(cat);

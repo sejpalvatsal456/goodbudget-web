@@ -13,61 +13,6 @@ import { useAccount } from "./hooks/useAccounts";
 import { useAuth } from "./components/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// export const MOCK_ACCOUNTS: Account[] = [
-//   {
-//     id: "1",
-//     name: "Wallet",
-//     type: "cash",
-//     kind: "cash",
-//     balance: 2340,
-//     isDisabled: false,
-//   },
-//   {
-//     id: "2",
-//     name: "HDFC Bank",
-//     type: "saving",
-//     kind: "bank",
-//     balance: 5780,
-//     isDisabled: false,
-//   },
-//   {
-//     id: "3",
-//     name: "SBI Current Account",
-//     type: "current",
-//     kind: "bank",
-//     balance: 2440,
-//     isDisabled: false,
-//   },
-//   {
-//     id: "4",
-//     name: "HDFC Credit Card",
-//     type: "credit_card",
-//     kind: "bank",
-//     balance: 1000,
-//     isDisabled: false,
-//   },
-// ];
-
-// export const MOCK_ACTIVITY: Activity[] = [
-//   {
-//     id: "a1",
-//     title: "Money added to Wallet",
-//     amount: 1000,
-//     date: "Oct 25, 2026 • 10:42 AM",
-//   },
-//   {
-//     id: "a2",
-//     title: "Payment from HDFC Bank",
-//     amount: 2500,
-//     date: "Oct 24, 2026 • 04:15 PM",
-//   },
-//   {
-//     id: "a3",
-//     title: "Payment to Credit Card",
-//     amount: -1000,
-//     date: "Oct 23, 2026 • 09:30 AM",
-//   },
-// ];
 
 // [ ]: The current UI has three different sections for accounts - Make it to two - active and disabled
 // [ ]: Make it mobile responsive
