@@ -35,7 +35,8 @@ export const TransactionStatusValues = ['success', 'pending', 'failed'] as const
 
 export type Transaction = {
   id: string;
-  category: string | null;
+  cat_id: string | null;
+  cat_name: string | null;
   merchant: string;
   amount: number; // negative = expense, positive = income
   when: string;

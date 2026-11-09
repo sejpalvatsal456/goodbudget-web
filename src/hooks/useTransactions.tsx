@@ -34,7 +34,8 @@ export const useTransactions = () => {
   const mapTransaction = (tran: ApiTransaction): Transaction => {
     return {
       id: tran.tran_id,
-      category: tran.cat_name,
+      cat_id: tran.cat_id,
+      cat_name: tran.cat_name,
       merchant: tran.tran_merchant,
       amount:  Number(tran.tran_amount), // negative = expense, positive = income
       acc_id: tran.account_id,

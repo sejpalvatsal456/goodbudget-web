@@ -16,7 +16,7 @@ export const TransactionList = ({
         <li key={t.id} className="flex items-center gap-3 px-2.5 py-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-[14px] font-medium">
-              {t.category ?? "Uncategoried Transaction"}
+              {t.cat_name ?? "Uncategoried Transaction"}
             </p>
             <p className="truncate text-[12px] text-muted">{t.merchant}</p>
           </div>

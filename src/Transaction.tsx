@@ -41,14 +41,14 @@ const TransactionPage = () => {
     if (loadingTransactions) return;
     // console.log(filters)
     const newTransactions = transactions
-      .filter(t => t.merchant.includes(filters.query) || t.category?.includes(filters.query))
+      .filter(t => t.merchant.includes(filters.query) || t.cat_name?.includes(filters.query))
       .filter((t) => filters.status === "all" || t.status === filters.status)
       .filter((t) => filters.type === "all" || t.type === filters.type);
     setFilteredTransactions(newTransactions);
     // console.log(newTransactions);
   }, [filters, transactions]);
 
-  const handleSubmit = async (value: Omit<Transaction, "id" | "when">) => {
+  const handleSubmit = async (value: Omit<Transaction, "id" | "when" | "cat_name">) => {
     // console.log(value);
     const id = drawer?.id;
     if (id) {
@@ -60,6 +60,7 @@ const TransactionPage = () => {
         tran_id: id,
         tran_status: value.status,
         tran_merchant: value.merchant,
+        cat_id: value.cat_id
       };
 
       const res = await apiFetch("/transactions", {
@@ -81,7 +82,8 @@ const TransactionPage = () => {
         status: data.result.tran_status,
         amount: Number(data.result.tran_amount),
         acc_id: data.result.account_id,
-        category: data.result.cat_name,
+        cat_id: data.result.cat_id,
+        cat_name: data.result.cat_name,
         when: new Date(data.result.created_at).toDateString(),
       };
 
@@ -97,6 +99,7 @@ const TransactionPage = () => {
         tran_type: value.type,
         account_id: value.acc_id,
         tran_amount: value.amount,
+        cat_id: value.cat_id
       };
 
       const res = await apiFetch("/transactions", {
@@ -120,7 +123,8 @@ const TransactionPage = () => {
         status: data.result.tran_status,
         amount: Number(data.result.tran_amount),
         acc_id: data.result.account_id,
-        category: data.result.cat_name,
+        cat_id: data.result.cat_id,
+        cat_name: data.result.cat_name,
         when: new Date(data.result.created_at).toDateString(),
       };
       setFilteredTransactions((list) => [...list, newTran]);
@@ -164,7 +168,7 @@ const TransactionPage = () => {
                   status: "success",
                   merchant: "",
                   amount: 0,
-                  category: null,
+                  cat_id: null,
                 });
               }}
             />

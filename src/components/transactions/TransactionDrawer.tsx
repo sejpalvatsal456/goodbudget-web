@@ -4,8 +4,9 @@ import type { Transaction } from "../../types/types";
 import { Field, SelectInput, TextInput } from "../ui/Field";
 import { Button } from "../ui/Button";
 import { useAccount } from "../../hooks/useAccounts";
+import { useCategory } from "../../hooks/useCategory";
 
-type Values = Omit<Transaction, "id" | "when">;
+type Values = Omit<Transaction, "id" | "when" | "cat_name">;
 
 // TODO: Add Category Field after category page is created
 // TODO: Add Transaction Date to change
@@ -14,7 +15,7 @@ const TransactionForm = ({
   initial,
   onSubmit,
   onCancel,
-  onDelete
+  onDelete,
 }: {
   initial: Partial<Transaction>;
   onSubmit: (v: Values) => void;
@@ -23,8 +24,9 @@ const TransactionForm = ({
 }) => {
   const isEdit = !!initial.id;
   const { accounts, loadingAccounts } = useAccount();
+  const { categories, loadingCategories } = useCategory();
   const [v, setV] = useState<Values>({
-    category: null,
+    cat_id: initial.cat_id || "",
     amount: 0,
     type: "expense",
     status: "success",
@@ -37,6 +39,11 @@ const TransactionForm = ({
     if (!accounts || loadingAccounts) return;
     setV({ ...v, acc_id: v.acc_id === "" ? accounts[0].id : v.acc_id });
   }, [accounts]);
+
+  useEffect(() => {
+    if(!categories || loadingCategories) return;
+    setV({ ...v, cat_id: (v.cat_id === "" ? categories[0].id : v.cat_id) })
+  }, [categories]);
 
   return (
     <form
@@ -87,7 +94,18 @@ const TransactionForm = ({
           onChange={(e) => setV({ ...v, amount: parseInt(e.target.value) })}
           disabled={isEdit}
           style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
-        /> 
+        />
+      </Field>
+      <Field label="Category">
+        <SelectInput
+          value={v.cat_id || ""}
+          onChange={e => e.target.value !== "" ? setV({ ...v, cat_id: e.target.value }) : setV({ ...v, cat_id: null })}
+        > 
+          <option value="">Uncategorized</option>
+          {categories.map((cat) => (
+            <option value={cat.id}>{cat.name}</option>
+          ))}
+        </SelectInput>
       </Field>
       <Field label="Status">
         <SelectInput
@@ -96,7 +114,11 @@ const TransactionForm = ({
             setV({ ...v, status: e.target.value as Transaction["status"] })
           }
           disabled={isEdit && v.status === "success"}
-          style={isEdit && v.status === "success" ? { backgroundColor: "#eee", color: "#888" } : {}}
+          style={
+            isEdit && v.status === "success"
+              ? { backgroundColor: "#eee", color: "#888" }
+              : {}
+          }
         >
           <option value="success">Success</option>
           <option value="pending">Pending</option>
@@ -105,7 +127,11 @@ const TransactionForm = ({
       </Field>
       {isEdit && initial.id ? (
         <div className="space-y-2 border-t border-black/5 pt-4">
-          <Button variant="outline" className="w-full" onClick={() => onDelete(initial.id || "")}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => onDelete(initial.id || "")}
+          >
             Delete Transaction
           </Button>
           <Button type="submit" className="w-full">
@@ -117,7 +143,9 @@ const TransactionForm = ({
           <Button variant="neutral" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loadingAccounts}>Issue</Button>
+          <Button type="submit" disabled={loadingAccounts || loadingCategories}>
+            Issue
+          </Button>
         </div>
       )}
     </form>

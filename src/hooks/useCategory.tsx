@@ -16,7 +16,7 @@ type ResponseType = {
 
 export const useCategory = () => {
   const { user, isInitializing, apiFetch } = useAuth();
-  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
