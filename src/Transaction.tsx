@@ -20,7 +20,7 @@ const TransactionPage = () => {
   const { transactions, loadingTransactions } = useTransactions();
   const [filteredTransactions, setFilteredTransactions] =
     useState<Transaction[]>(transactions);
-  const { apiFetch, isInitializing, statusCode } = useAuth();
+  const { user, apiFetch, isInitializing, statusCode } = useAuth();
   const [drawer, setDrawer] = useState<Partial<Transaction> | null>(null);
   const navigate = useNavigate();
 
@@ -74,7 +74,6 @@ const TransactionPage = () => {
         console.log(data.msg);
         return;
       }
-
       const newTran: Transaction = {
         id: data.result.tran_id,
         merchant: data.result.tran_merchant,
@@ -86,7 +85,6 @@ const TransactionPage = () => {
         cat_name: data.result.cat_name,
         when: new Date(data.result.created_at).toDateString(),
       };
-
       setFilteredTransactions((list) =>
         list.map((t) => (t.id === data.result.tran_id ? newTran : t)),
       );
@@ -127,6 +125,7 @@ const TransactionPage = () => {
         cat_name: data.result.cat_name,
         when: new Date(data.result.created_at).toDateString(),
       };
+      console.log(newTran)
       setFilteredTransactions((list) => [...list, newTran]);
       setDrawer(null);
     }
@@ -154,7 +153,7 @@ const TransactionPage = () => {
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">
       <Sidebar active={active} onChange={setActive} />
       <div className="min-w-0 flex-1 px-4 py-5.5 lg:px-7">
-        <TransactionsHeader name="Vatsal" />
+        <TransactionsHeader name={user?.user_name || "-"} />
         <div className="grid mt-5 gap-4 xl:grid-cols-[1fr_300px]">
           <div className="space-y-4">
             <TransactionCard transactions={filteredTransactions} />
