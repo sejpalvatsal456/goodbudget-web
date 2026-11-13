@@ -13,11 +13,13 @@ import { TransactionDrawer } from "./components/transactions/TransactionDrawer";
 import { TransactionCard } from "./components/transactions/TransactionCard";
 import { TransactionList } from "./components/transactions/TransactionList";
 import { CategoryPanel } from "./components/transactions/CategoryPanel";
+import { useCategory } from "./hooks/useCategory";
 
 const TransactionPage = () => {
   const [active, setActive] = useState<string>("Transactions");
   const [filters, setFilters] = useState(defaultFilter);
   const { transactions, loadingTransactions } = useTransactions();
+  const { categories, loadingCategories } = useCategory();
   const [filteredTransactions, setFilteredTransactions] =
     useState<Transaction[]>(transactions);
   const { user, apiFetch, isInitializing, statusCode } = useAuth();
@@ -39,9 +41,10 @@ const TransactionPage = () => {
   // TODO add category filter
   useEffect(() => {
     if (loadingTransactions) return;
-    // console.log(filters)
+    console.log(filters)
     const newTransactions = transactions
       .filter(t => t.merchant.includes(filters.query) || t.cat_name?.includes(filters.query))
+      .filter(t => (filters.category === "all") || (filters.category === "null" && t.cat_id === null) || (t.cat_id === filters.category))
       .filter((t) => filters.status === "all" || t.status === filters.status)
       .filter((t) => filters.type === "all" || t.type === filters.type);
     setFilteredTransactions(newTransactions);
@@ -160,7 +163,7 @@ const TransactionPage = () => {
             <TransactionFilter
               filters={filters}
               onChange={setFilters}
-              // onAdd={() => openAdd()}
+              categories={loadingCategories ? [] : categories}
               onAdd={() => {
                 setDrawer({
                   type: "expense",

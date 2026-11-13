@@ -2,48 +2,62 @@ import { Plus, Search } from "lucide-react";
 import {
   TransactionStatusValues,
   TransactionTypeValues,
+  type Category,
 } from "../../types/types";
 import { capitalize } from "../../utils/utils";
 import { SelectInput } from "../ui/Field";
 import { Button } from "../ui/Button";
 
-export const defaultFilter = { query: "", status: "all", type: "all" };
+export const defaultFilter = { query: "", status: "all", type: "all", category: "all" };
 
 type TranFilter = typeof defaultFilter;
 
 type TransactionFilterProps = {
   filters: TranFilter;
+  categories: Category[]
   onChange: (filter: TranFilter) => void;
   onAdd: () => void;
 };
 
 // [ ]: add a filter for "by accounts"
 
-const selects: {
-  key: Exclude<keyof TranFilter, "query">;
-  options: string[][];
-}[] = [
-  {
-    key: "status",
-    options: [
-      ["all", "All Transactions"],
-      ...TransactionStatusValues.map((value) => [value, capitalize(value)]),
-    ],
-  },
-  {
-    key: "type",
-    options: [
-      ["all", "All Types"],
-      ...TransactionTypeValues.map((value) => [value, capitalize(value)]),
-    ],
-  },
-];
+
 
 export const TransactionFilter = ({
   filters,
+  categories,
   onChange,
   onAdd,
 }: TransactionFilterProps) => {
+
+  const selects: {
+    key: Exclude<keyof TranFilter, "query">;
+    options: string[][];
+  }[] = [
+    {
+      key: "status",
+      options: [
+        ["all", "All Transactions"],
+        ...TransactionStatusValues.map((value) => [value, capitalize(value)]),
+      ],
+    },
+    {
+      key: "type",
+      options: [
+        ["all", "All Types"],
+        ...TransactionTypeValues.map((value) => [value, capitalize(value)]),
+      ],
+    },
+    {
+      key: "category",
+      options: [
+        ["all", "All Category"],
+        ["null", "Uncategoried"],
+        ...categories.map((cat) => [cat.id, cat.name])
+      ]
+    }
+  ];
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <label className="hidden h-9 min-w-[180px] flex-1 items-center gap-2 rounded-lg border border-black/10 bg-white px-3 text-muted md:flex">
