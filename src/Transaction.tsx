@@ -14,6 +14,7 @@ import { TransactionCard } from "./components/transactions/TransactionCard";
 import { TransactionList } from "./components/transactions/TransactionList";
 import { CategoryPanel } from "./components/transactions/CategoryPanel";
 import { useCategory } from "./hooks/useCategory";
+import { mapTransaction } from "./utils/utils";
 
 const TransactionPage = () => {
   const [active, setActive] = useState<string>("Transactions");
@@ -41,101 +42,71 @@ const TransactionPage = () => {
   // TODO add category filter
   useEffect(() => {
     if (loadingTransactions) return;
-    console.log(filters)
+    console.log(filters);
     const newTransactions = transactions
-      .filter(t => t.merchant.includes(filters.query) || t.cat_name?.includes(filters.query))
-      .filter(t => (filters.category === "all") || (filters.category === "null" && t.cat_id === null) || (t.cat_id === filters.category))
+      .filter(
+        (t) =>
+          t.merchant.includes(filters.query) ||
+          t.cat_name?.includes(filters.query),
+      )
+      .filter(
+        (t) =>
+          filters.category === "all" ||
+          (filters.category === "null" && t.cat_id === null) ||
+          t.cat_id === filters.category,
+      )
       .filter((t) => filters.status === "all" || t.status === filters.status)
       .filter((t) => filters.type === "all" || t.type === filters.type);
     setFilteredTransactions(newTransactions);
     // console.log(newTransactions);
   }, [filters, transactions]);
 
-  const handleSubmit = async (value: Omit<Transaction, "id" | "when" | "cat_name">) => {
-    // console.log(value);
+  const handleSubmit = async (
+    value: Omit<Transaction, "id" | "when" | "cat_name">,
+  ) => {
     const id = drawer?.id;
-    if (id) {
-      // edit mode
-      console.log("Edit Mode: ");
-      console.log(value);
+    const cat_id = value.cat_id || null;  
 
-      const payload = {
-        tran_id: id,
-        tran_status: value.status,
-        tran_merchant: value.merchant,
-        cat_id: value.cat_id
-      };
+    const method = id ? "PATCH" : "POST";
 
-      const res = await apiFetch("/transactions", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        console.log(data.msg);
-        return;
-      }
-      const newTran: Transaction = {
-        id: data.result.tran_id,
-        merchant: data.result.tran_merchant,
-        type: data.result.tran_type,
-        status: data.result.tran_status,
-        amount: Number(data.result.tran_amount),
-        acc_id: data.result.account_id,
-        cat_id: data.result.cat_id,
-        cat_name: data.result.cat_name,
-        when: new Date(data.result.created_at).toDateString(),
-      };
-      setFilteredTransactions((list) =>
-        list.map((t) => (t.id === data.result.tran_id ? newTran : t)),
-      );
-      setDrawer(null);
-    } else {
-      // add mode
-      const payload = {
-        tran_merchant: value.merchant,
-        tran_status: value.status,
-        tran_type: value.type,
-        account_id: value.acc_id,
-        tran_amount: value.amount,
-        cat_id: value.cat_id
-      };
-
-      const res = await apiFetch("/transactions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        console.log(data.msg);
-        return;
-      }
-      console.log("Data from API: ");
-      console.log(data);
-      const newTran: Transaction = {
-        id: data.result.tran_id,
-        merchant: data.result.tran_merchant,
-        type: data.result.tran_type,
-        status: data.result.tran_status,
-        amount: Number(data.result.tran_amount),
-        acc_id: data.result.account_id,
-        cat_id: data.result.cat_id,
-        cat_name: data.result.cat_name,
-        when: new Date(data.result.created_at).toDateString(),
-      };
-      console.log(newTran)
-      setFilteredTransactions((list) => [...list, newTran]);
-      setDrawer(null);
+    const payload = id 
+    ? {
+      tran_id: id,
+      tran_status: value.status,
+      tran_merchant: value.merchant,
+      tran_amount: value.amount,
+      cat_id,
+    } : {
+      tran_merchant: value.merchant,
+      tran_status: value.status,
+      tran_type: value.type,
+      acc_id: value.acc_id,
+      tran_amount: value.amount,
+      cat_id,
     }
+
+    const res = await apiFetch("/transactions", {
+      method: method,
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if(!data.ok) {
+      console.log(data.msg);
+      return;
+    }
+
+    // if (!data) return;
+
+    const t = mapTransaction(data.result);
+    setFilteredTransactions((list) =>
+      id ? list.map((x) => (x.id === t.id ? t : x)) : [...list, t],
+    );
+    setDrawer(null);
   };
 
   const handledelete = async (id: string) => {
-    // console.log("Deleting id: " + id);
     const res = await apiFetch("/transactions", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },

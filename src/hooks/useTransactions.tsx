@@ -1,24 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthContext";
-import type { Transaction } from "../types/types";
-
-type ApiTransaction = {
-  tran_id: string,
-  trans_desc: string,
-  tran_status: "pending" | "success" | "failed",
-  user_id: string,
-  account_id: string,
-  tran_merchant: string,
-  tran_mode: string,
-  tran_type: "income" | "expense",
-  tran_date:  string,
-  tran_amount: string,
-  created_at: string,
-  updated_at: string,
-  deleted_at: string | null,
-  cat_id: string | null,
-  cat_name: string | null
-};
+import type { Transaction, ApiTransaction } from "../types/types";
+import { mapTransaction } from "../utils/utils";
 
 type ResponseType = {
   msg: string,
@@ -30,20 +13,6 @@ export const useTransactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingTransactions, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const mapTransaction = (tran: ApiTransaction): Transaction => {
-    return {
-      id: tran.tran_id,
-      cat_id: tran.cat_id,
-      cat_name: tran.cat_name,
-      merchant: tran.tran_merchant,
-      amount:  Number(tran.tran_amount), // negative = expense, positive = income
-      acc_id: tran.account_id,
-      when: (new Date(tran.created_at)).toDateString(),
-      status: tran.tran_status,
-      type: tran.tran_type,
-    }
-  }
 
   const fetchTransactions = async() => {
     try {

@@ -45,6 +45,24 @@ export type Transaction = {
   status: typeof TransactionStatusValues[number]
 };
 
+export type ApiTransaction = {
+  tran_id: string,
+  trans_desc: string,
+  tran_status: "pending" | "success" | "failed",
+  user_id: string,
+  account_id: string,
+  tran_merchant: string,
+  tran_mode: string,
+  tran_type: "income" | "expense",
+  tran_date:  string,
+  tran_amount: string,
+  created_at: string,
+  updated_at: string,
+  deleted_at: string | null,
+  cat_id: string | null,
+  cat_name: string | null
+};
+
 export type Category = {
   id: string;
   name: string;

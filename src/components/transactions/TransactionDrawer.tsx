@@ -11,6 +11,10 @@ type Values = Omit<Transaction, "id" | "when" | "cat_name">;
 // TODO: Add Category Field after category page is created
 // TODO: Add Transaction Date to change
 // TODO: Add Transaction Mode
+
+const lock = (on: boolean) =>
+  on ? { disabled: true, style: { backgroundColor: "#eee", color: "#888" } } : {};
+
 const TransactionForm = ({
   initial,
   onSubmit,
@@ -23,6 +27,8 @@ const TransactionForm = ({
   onDelete: (id: string) => void;
 }) => {
   const isEdit = !!initial.id;
+  // success and failed transactions are final, only delete is allowed
+  const isFinal = isEdit && initial.status !== "pending";
   const { accounts, loadingAccounts } = useAccount();
   const { categories, loadingCategories } = useCategory();
   const [v, setV] = useState<Values>({
@@ -36,31 +42,28 @@ const TransactionForm = ({
   });
 
   useEffect(() => {
-    if (!accounts || loadingAccounts) return;
-    setV({ ...v, acc_id: v.acc_id === "" ? accounts[0].id : v.acc_id });
-  }, [accounts]);
-
-  useEffect(() => {
-    if(!categories || loadingCategories) return;
-    setV({ ...v, cat_id: (v.cat_id === "" ? categories[0].id : v.cat_id) })
-  }, [categories]);
+    if (loadingAccounts || !accounts?.length) return;
+    setV((p) => ({ ...p, acc_id: p.acc_id || accounts[0].id }));
+  }, [accounts, loadingAccounts]);
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit(v);
+        if (!isFinal) onSubmit(v);
       }}
       className="space-y-4"
     >
+      {isFinal && (
+        <p className="text-xs text-muted">
+          This transaction is {initial.status} and can no longer be edited.
+        </p>
+      )}
       <Field label="Transaction Type">
         <SelectInput
           value={v.type}
-          onChange={(e) =>
-            setV({ ...v, type: e.target.value as Transaction["type"] })
-          }
-          disabled={isEdit}
-          style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
+          onChange={(e) => setV({ ...v, type: e.target.value as Transaction["type"] })}
+          {...lock(isEdit)}
         >
           <option value="income">Income</option>
           <option value="expense">Expense</option>
@@ -71,17 +74,17 @@ const TransactionForm = ({
           value={v.merchant}
           onChange={(e) => setV({ ...v, merchant: e.target.value })}
           placeholder="Merchant Name..."
+          {...lock(isFinal)}
         />
       </Field>
       <Field label="Account">
         <SelectInput
           value={v.acc_id}
           onChange={(e) => setV({ ...v, acc_id: e.target.value })}
-          disabled={isEdit}
-          style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
+          {...lock(isEdit)}
         >
-          {accounts.map((acc, key) => (
-            <option key={key} value={acc.id}>
+          {accounts.map((acc) => (
+            <option key={acc.id} value={acc.id}>
               {acc.name}
             </option>
           ))}
@@ -90,35 +93,32 @@ const TransactionForm = ({
       <Field label="Amount">
         <TextInput
           type="number"
+          min="0"
+          step="0.01"
           value={v.amount}
-          onChange={(e) => setV({ ...v, amount: parseInt(e.target.value) })}
-          disabled={isEdit}
-          style={isEdit ? { backgroundColor: "#eee", color: "#888" } : {}}
+          onChange={(e) => setV({ ...v, amount: Number(e.target.value) })}
+          {...lock(isFinal)}
         />
       </Field>
       <Field label="Category">
         <SelectInput
           value={v.cat_id || ""}
-          onChange={e => e.target.value !== "" ? setV({ ...v, cat_id: e.target.value }) : setV({ ...v, cat_id: null })}
-        > 
+          onChange={(e) => setV({ ...v, cat_id: e.target.value || null })}
+          {...lock(isFinal)}
+        >
           <option value="">Uncategorized</option>
           {categories.map((cat) => (
-            <option value={cat.id}>{cat.name}</option>
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
           ))}
         </SelectInput>
       </Field>
       <Field label="Status">
         <SelectInput
           value={v.status}
-          onChange={(e) =>
-            setV({ ...v, status: e.target.value as Transaction["status"] })
-          }
-          disabled={isEdit && v.status === "success"}
-          style={
-            isEdit && v.status === "success"
-              ? { backgroundColor: "#eee", color: "#888" }
-              : {}
-          }
+          onChange={(e) => setV({ ...v, status: e.target.value as Transaction["status"] })}
+          {...lock(isFinal)}
         >
           <option value="success">Success</option>
           <option value="pending">Pending</option>
@@ -127,20 +127,18 @@ const TransactionForm = ({
       </Field>
       {isEdit && initial.id ? (
         <div className="space-y-2 border-t border-black/5 pt-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => onDelete(initial.id || "")}
-          >
+          <Button type="button" variant="outline" className="w-full" onClick={() => onDelete(initial.id!)}>
             Delete Transaction
           </Button>
-          <Button type="submit" className="w-full">
-            Save Changes
-          </Button>
+          {!isFinal && (
+            <Button type="submit" className="w-full">
+              Save Changes
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="neutral" onClick={onCancel}>
+          <Button type="button" variant="neutral" onClick={onCancel}>
             Cancel
           </Button>
           <Button type="submit" disabled={loadingAccounts || loadingCategories}>
