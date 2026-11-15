@@ -2,11 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { initials } from "../../utils/utils";
 import Logo from "../Logo";
 
-interface TransactionsHeaderProps {
-  name: string;
-}
-
-export const TransactionsHeader = ({ name }: TransactionsHeaderProps) => (
+export const TransactionsHeader = ({ name }: { name: string }) => (
   <header className="flex flex-wrap items-start justify-between gap-3">
     <div>
       <div className="mb-2.5 lg:hidden">

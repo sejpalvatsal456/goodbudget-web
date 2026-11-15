@@ -87,6 +87,7 @@ const TransactionPage = () => {
 
     const res = await apiFetch("/transactions", {
       method: method,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
