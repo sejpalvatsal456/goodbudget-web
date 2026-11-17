@@ -39,10 +39,10 @@ export default function ExpensePieChart({
     `₹${amount.toLocaleString("en-IN")}`;
 
   return (
-    <div className="flex items-center w-full gap-5">
+    <div className="flex items-center w-full gap-10">
 
       {/* Donut Chart */}
-      <div className="w-[42%] aspect-square shrink-0">
+      <div className="w-[40%] aspect-square shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -51,7 +51,8 @@ export default function ExpensePieChart({
               nameKey="name"
               innerRadius="68%"
               outerRadius="100%"
-              paddingAngle={2}
+              cornerRadius="20%"
+              paddingAngle={10}
               stroke="none"
               isAnimationActive
             >

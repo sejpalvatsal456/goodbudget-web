@@ -6,11 +6,66 @@ import { ArrowBigDown, ArrowBigUp, Wallet } from "lucide-react";
 import { inr } from "./utils/utils";
 import { Card } from "./components/ui/Card";
 import PieChartWithPaddingAngle from "./components/ui/PieChart";
+import { SelectInput } from "./components/ui/Field";
+import DoubleBarChart from "./components/ui/DoubleBarChart";
 
+// Income and Expense Pie Chart
 interface CategorySummary {
   id: string | null;
   name: string;
   value: string | number;
+}
+
+const IncomeExpensePie = ({
+  incomeData,
+  expenseData,
+}: {
+  incomeData: CategorySummary[];
+  expenseData: CategorySummary[];
+}) => {
+  const [option, setOption] = useState<string>("expense");
+
+  return (
+    <Card className="w-1/2 px-10 pb-5">
+      <div className="w-[30%] mb-5">
+        <SelectInput
+          onChange={e => setOption(e.target.value)}
+        >
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </SelectInput>
+      </div>
+      <PieChartWithPaddingAngle
+        data={(option === "expense" ? expenseData : incomeData).map((item) => ({
+          name: item.name,
+          value: Number(item.value),
+        }))}
+        centerLabel="Total Expense"
+      />
+    </Card>
+  );
+};
+
+// Income vs expense Bar Chart
+
+interface WeekwiseTransaction {
+  week: number;
+  income: number | string;
+  expense: number | string;
+}
+
+const WeekwiseTransactionChart = ({data} : { data: WeekwiseTransaction[] }) => {
+  return (
+    <Card className="w-1/2 px-10">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Income vs Expense
+        </h2>
+      </div>
+      <DoubleBarChart data={data} />
+
+    </Card>
+  )
 }
 
 export const SummaryPage = () => {
@@ -18,6 +73,8 @@ export const SummaryPage = () => {
   const [totalExpense, setTotalExpense] = useState<number>(0);
   const [totalIncome, setTotalIncome] = useState<number>(0);
   const [expenseData, setExpenseData] = useState<CategorySummary[]>([]);
+  const [incomeData, setIncomeData] = useState<CategorySummary[]>([]);
+  const [weekwiseData, setWeekwiseData] = useState<WeekwiseTransaction[]>([]);
 
   const { user, isInitializing, apiFetch } = useAuth();
 
@@ -37,11 +94,22 @@ export const SummaryPage = () => {
       });
 
       const data = await res.json();
-      console.log(data);
-      console.log(data.categorywiseExpenseResult);
+      // console.log(data);
+      // console.log(data.categorywiseExpenseResult);
       setExpenseData(data.categorywiseExpenseResult);
+      setIncomeData(data.categorywiseIncomeResult);
       setTotalExpense(data.result.total_value_of_expense);
       setTotalIncome(data.result.total_value_of_income);
+
+      const weekwiseUrl = `/summary/week?start_date=${start_date.toISOString()}&end_date=${end_date.toISOString()}`;
+      const weekwiseRes = await apiFetch(weekwiseUrl, {
+        method: "GET"
+      })
+
+      const weekwiseData = await weekwiseRes.json();
+      console.log(weekwiseData);
+      setWeekwiseData(weekwiseData.result)
+
     };
 
     void fetchData();
@@ -108,17 +176,9 @@ export const SummaryPage = () => {
             </section>
           </div>
 
-          <div className="mt-5">
-            <Card className="w-1/2">
-              <h1 className="font-semibold text-lg mb-5">Expense</h1>
-              <PieChartWithPaddingAngle
-                data={expenseData.map((item) => ({
-                  name: item.name,
-                  value: Number(item.value),
-                }))}
-                centerLabel="Total Expense"
-              />
-            </Card>
+          <div className="mt-5 flex gap-10 flex-row">
+            <IncomeExpensePie incomeData={incomeData} expenseData={expenseData} />
+            <WeekwiseTransactionChart data={weekwiseData}  />
           </div>
         </div>
       </div>
