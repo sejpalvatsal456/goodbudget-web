@@ -1,11 +1,9 @@
-import React from "react";
 import {
   ResponsiveContainer,
   CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   Bar,
   BarChart,
 } from "recharts";

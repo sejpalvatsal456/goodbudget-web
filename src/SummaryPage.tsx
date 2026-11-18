@@ -8,6 +8,7 @@ import { Card } from "./components/ui/Card";
 import PieChartWithPaddingAngle from "./components/ui/PieChart";
 import { SelectInput } from "./components/ui/Field";
 import DoubleBarChart from "./components/ui/DoubleBarChart";
+import type { Transaction } from "./types/types";
 
 // Income and Expense Pie Chart
 interface CategorySummary {
@@ -28,9 +29,7 @@ const IncomeExpensePie = ({
   return (
     <Card className="w-1/2 px-10 pb-5">
       <div className="w-[30%] mb-5">
-        <SelectInput
-          onChange={e => setOption(e.target.value)}
-        >
+        <SelectInput onChange={(e) => setOption(e.target.value)}>
           <option value="expense">Expense</option>
           <option value="income">Income</option>
         </SelectInput>
@@ -54,7 +53,11 @@ interface WeekwiseTransaction {
   expense: number | string;
 }
 
-const WeekwiseTransactionChart = ({data} : { data: WeekwiseTransaction[] }) => {
+const WeekwiseTransactionChart = ({
+  data,
+}: {
+  data: WeekwiseTransaction[];
+}) => {
   return (
     <Card className="w-1/2 px-10">
       <div className="mb-6">
@@ -63,10 +66,49 @@ const WeekwiseTransactionChart = ({data} : { data: WeekwiseTransaction[] }) => {
         </h2>
       </div>
       <DoubleBarChart data={data} />
-
     </Card>
-  )
+  );
+};
+
+export interface AccountSummary {
+  acc_id: string;
+  acc_name: string;
+  acc_type: string;
+
+  total_number_of_transaction: number;
+  total_value_of_transaction: number;
+
+  total_number_of_income: number;
+  total_number_of_expense: number;
+
+  total_value_of_income: number;
+  total_value_of_expense: number;
+
+  most_expense_transaction: Transaction | null;
+  most_income_transaction: Transaction | null;
+
+  least_expense_transaction: Transaction | null;
+  least_income_transaction: Transaction | null;
 }
+
+const AccountwiseCard = ({ data }: { data: AccountSummary[] }) => {
+  return (
+    <Card className="w-1/2 px-10 pb-5">
+      <div className="mb-6 flex flex-row justify-between">
+        <h1 className="text-lg font-semibold text-gray-900">
+          Accountwise Breakdown
+        </h1>
+      </div>
+      <PieChartWithPaddingAngle
+        data={data.map((item) => ({
+          name: item.acc_name,
+          value: Number(item.total_value_of_transaction),
+        }))}
+        centerLabel="Total Expense"
+      />
+    </Card>
+  );
+};
 
 export const SummaryPage = () => {
   const [active, setActive] = useState<string>("Summary");
@@ -75,6 +117,7 @@ export const SummaryPage = () => {
   const [expenseData, setExpenseData] = useState<CategorySummary[]>([]);
   const [incomeData, setIncomeData] = useState<CategorySummary[]>([]);
   const [weekwiseData, setWeekwiseData] = useState<WeekwiseTransaction[]>([]);
+  const [accountwiseData, setAccountwiseData] = useState<AccountSummary[]>([]);
 
   const { user, isInitializing, apiFetch } = useAuth();
 
@@ -103,17 +146,24 @@ export const SummaryPage = () => {
 
       const weekwiseUrl = `/summary/week?start_date=${start_date.toISOString()}&end_date=${end_date.toISOString()}`;
       const weekwiseRes = await apiFetch(weekwiseUrl, {
-        method: "GET"
-      })
+        method: "GET",
+      });
 
       const weekwiseData = await weekwiseRes.json();
-      console.log(weekwiseData);
-      setWeekwiseData(weekwiseData.result)
-
+      // console.log(weekwiseData);
+      setWeekwiseData(weekwiseData.result);
+      const acc_id = "978e1866-98fd-4a25-9f4f-a75b045fe92d";
+      const accountwiseUrl = `/summary/accounts?start_date=${start_date.toISOString()}&end_date=${end_date.toISOString()}&acc_id=${acc_id}`;
+      const accountwiseRes = await apiFetch(accountwiseUrl, { method: "GET" });
+      const accountwiseData = await accountwiseRes.json();
+      // console.log(accountwiseData);
+      setAccountwiseData(accountwiseData.result);
     };
 
     void fetchData();
   }, [user, isInitializing, apiFetch]);
+
+  useEffect(() => console.log(accountwiseData), [accountwiseData]);
 
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">
@@ -177,8 +227,16 @@ export const SummaryPage = () => {
           </div>
 
           <div className="mt-5 flex gap-10 flex-row">
-            <IncomeExpensePie incomeData={incomeData} expenseData={expenseData} />
-            <WeekwiseTransactionChart data={weekwiseData}  />
+            <IncomeExpensePie
+              incomeData={incomeData}
+              expenseData={expenseData}
+            />
+            <WeekwiseTransactionChart data={weekwiseData} />
+          </div>
+
+          {/* Summary accountwise */}
+          <div className="mt-5 flex gap-10 flex-row">
+            <AccountwiseCard data={accountwiseData} />
           </div>
         </div>
       </div>
