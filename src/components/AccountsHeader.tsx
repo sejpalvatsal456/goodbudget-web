@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import Logo from "../components/Logo";
 import { initials } from "../utils/utils";
 
@@ -8,7 +8,7 @@ interface Props {
   onQueryChange: (value: string) => void;
 }
 
-export const AccountsHeader = ({ name, query, onQueryChange }: Props) => (
+export const AccountsHeader = ({ name }: Props) => (
   <header className="flex flex-wrap items-start justify-between gap-3">
     <div>
       <div className="mb-2.5 lg:hidden">

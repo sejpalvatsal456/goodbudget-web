@@ -1,6 +1,6 @@
 import { MoreVertical, Plus } from "lucide-react";
 import type { Account } from "../types/types";
-import { TYPE_LABEL, type Group, type GroupMeta } from "../constants/constant";
+import { TYPE_LABEL, type Group } from "../constants/constant";
 import { Button } from "./ui/Button";
 import { Card } from "./ui/Card";
 import { IconBubble } from "./ui/IconBubble";

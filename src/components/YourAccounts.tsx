@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight, Wallet } from "lucide-react";
 import { inr } from "../utils/utils";
 import type { Account } from "../types/types";
 
@@ -12,7 +12,7 @@ export const YourAccounts = ({ accounts }: { accounts: Account[] }) => {
         </a>
       </div>
       <ul className="flex flex-col gap-2.5">
-        {accounts.map(({ id, name, type, balance, icon: Icon, color }) => (
+        {accounts.map(({ id, name, type, balance, icon: Icon = Wallet, color }) => (
           <li key={id}>
             <button className="flex h-[61px] w-full items-center gap-3 rounded-xl border border-line bg-white px-3 text-left transition hover:bg-[#fafafc]">
               <span className={`grid size-[40px] shrink-0 place-items-center rounded-full text-white ${color}`}>

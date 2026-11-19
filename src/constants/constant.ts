@@ -1,5 +1,5 @@
 import { CreditCard, Landmark, Wallet, type LucideIcon } from "lucide-react";
-import type { Account, AccountGroupKey, Activity } from "../types/types";
+import type { Account, AccountGroupKey } from "../types/types";
 
 export interface GroupMeta {
   label: string;

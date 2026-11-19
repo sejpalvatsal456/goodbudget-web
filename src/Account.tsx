@@ -66,7 +66,7 @@ export const AccountPage = () => {
         acc_type: values.type,
         acc_balance: values.balance,
       };
-      const res = await apiFetch("/accounts/", {
+      await apiFetch("/accounts/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
