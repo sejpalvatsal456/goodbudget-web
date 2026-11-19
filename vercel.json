@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://goodbudget-backend.vercel.app/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
