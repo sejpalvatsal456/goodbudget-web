@@ -9,6 +9,8 @@ import { useAuth } from "../AuthContext";
 
 type Values = Omit<Category, "id">;
 
+// TODO: Add Delete category button in edit mode too
+
 export const CategoryPanel = () => {
   const { user, isInitializing, apiFetch } = useAuth();
   const [query, setQuery] = useState<string>("");
@@ -21,6 +23,15 @@ export const CategoryPanel = () => {
     if (loadingCategories || !categories) return;
     setDisplayCategories(categories);
   }, [categories, loadingCategories]);
+
+  useEffect(() => {
+    const newDisplayCat = categories.filter(
+      (cat) =>
+        cat.name.toLowerCase().includes(query.toLowerCase()) ||
+        cat.desc.toLowerCase().includes(query.toLowerCase()),
+    );
+    setDisplayCategories(newDisplayCat);
+  }, [query]);
 
   const handleSubmit = async (cat: Values) => {
     if (!user || isInitializing) return;
@@ -47,6 +58,8 @@ export const CategoryPanel = () => {
         name: data.result.cat_name,
         desc: data.result.cat_desc,
       };
+      // (list) => [...list, newCat]
+      console.log([...displayCategories, newCat]);
       setDisplayCategories((list) => [...list, newCat]);
     } else {
       // Edit Mode
@@ -84,6 +97,24 @@ export const CategoryPanel = () => {
     }
   };
 
+  const handleDelete = async (cat_id: string) => {
+    if(!cat_id) return;
+    const res = await apiFetch("/categories", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cat_id: cat_id })
+    });
+
+    const data = await res.json();
+    if(!res.ok) {
+      alert(data.msg);
+      return;
+    }
+    setDisplayCategories(list => list.filter(cat => cat.id !== cat_id));
+    setCat({ name: "", desc: "" });
+    setEditId(null);
+  };
+
   return (
     <Card className="h-full flex flex-col">
       <div className="flex xl:flex-col md:flex-row md:justify-evenly xl:justify-start mt-5 gap-5">
@@ -100,7 +131,10 @@ export const CategoryPanel = () => {
           </label>
           <ul className="mt-5 min-h-50 flex flex-col gap-5">
             {displayCategories.map((cat, key) => (
-              <li key={key} className="px-3 flex flex-row justify-between border-1 border-black/10 rounded-lg p-3">
+              <li
+                key={key}
+                className="px-3 flex flex-row justify-between border-1 border-black/10 rounded-lg p-3"
+              >
                 <span className="text-sm">{cat.name}</span>
                 <button
                   onClick={() => {
@@ -120,6 +154,7 @@ export const CategoryPanel = () => {
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit(cat);
+            setCat({ name: "", desc: "" });
           }}
         >
           <h1 className="text-lg font-semibold">Add Category</h1>
@@ -140,16 +175,27 @@ export const CategoryPanel = () => {
             {editId ? "Save Changes" : "Add Category"}
           </Button>
           {editId ? (
-            <Button
-              className="w-full"
-              variant="neutral"
-              onClick={() => {
-                setEditId("");
-                setCat({ name: "", desc: "" });
-              }}
-            >
-              Cancel Changes
-            </Button>
+            <div className="flex flex-row gap-2">
+              <Button
+                className="w-full"
+                variant="neutral"
+                onClick={() => {
+                  setEditId("");
+                  setCat({ name: "", desc: "" });
+                }}
+              >
+                Cancel Changes
+              </Button>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => {
+                  handleDelete(editId);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
           ) : null}
         </form>
       </div>
