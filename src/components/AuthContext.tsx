@@ -25,7 +25,7 @@ type AuthContextType = {
   setAuth: (accessToken: string, user: User) => void;
   clearAuth: () => void;
   apiFetch: (path: string, options?: RequestInit) => Promise<Response>;
-  statusCode: number | null
+  statusCode: number | null;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [statusCode, setStatusCode] = useState<number | null>(null);
 
-  // Share one refresh request across concurrent API calls.
+  // Share one refresh request across startup and concurrent API calls.
   const refreshPromise = useRef<Promise<string | null> | null>(null);
 
   const setAuth = useCallback((token: string, userData: User) => {
@@ -49,86 +49,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   }, []);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const response = await fetch(`${API_URL}/auth/refresh`, {
-          method: "POST",
-          credentials: "include",
-        });
-        setStatusCode(response.status);
-        if (!response.ok) {
-          clearAuth();
-          return;
-        }
-
-        const data: {
-          accessToken: string;
-          user: User;
-        } = await response.json();
-
-        if (!data.accessToken || !data.user) {
-          clearAuth();
-          return;
-        }
-
-        setAuth(data.accessToken, data.user);
-      } catch (error) {
-        console.error("Failed to restore session:", error);
-        clearAuth();
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-
-    void initializeAuth();
-  }, [clearAuth, setAuth]);
-
-  // Request a new access token using the HTTP-only refresh cookie.
-  const refreshAccessToken = useCallback(async (): Promise<string | null> => {
-    if (refreshPromise.current) {
-      return refreshPromise.current;
-    }
+  // Uses the HTTP-only refresh cookie to get a new access token.
+  // It never clears auth itself, so a late failure can't undo a fresh login;
+  // callers decide what a failure means.
+  const refreshSession = useCallback(async (): Promise<string | null> => {
+    if (refreshPromise.current) return refreshPromise.current;
 
     const request = (async (): Promise<string | null> => {
       try {
-        const response = await fetch(`${API_URL}/auth/refresh`, {
+        const res = await fetch(`${API_URL}/auth/refresh`, {
           method: "POST",
           credentials: "include",
         });
-        setStatusCode(response.status);
+        setStatusCode(res.status);
+        if (!res.ok) return null;
 
-        if (!response.ok) {
-          clearAuth();
-          return null;
-        }
-
-        const data: { accessToken?: string } = await response.json();
-
-        if (!data.accessToken) {
-          clearAuth();
-          return null;
-        }
+        const data: { accessToken?: string; user?: User } = await res.json();
+        if (!data.accessToken) return null;
 
         setAccessToken(data.accessToken);
+        if (data.user) setUser(data.user);
         return data.accessToken;
       } catch (error) {
         console.error("Token refresh failed:", error);
-        clearAuth();
         return null;
       }
     })();
 
     refreshPromise.current = request;
-
     try {
       return await request;
     } finally {
-      if (refreshPromise.current === request) {
-        refreshPromise.current = null;
-      }
+      if (refreshPromise.current === request) refreshPromise.current = null;
     }
-  }, [clearAuth]);
+  }, []);
+
+  // Restore the session on mount. Failure just means "not logged in".
+  useEffect(() => {
+    void refreshSession().finally(() => setIsInitializing(false));
+  }, [refreshSession]);
 
   // Make authenticated requests and retry once after refreshing.
   const apiFetch = useCallback(
@@ -146,37 +105,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           headers.delete("Authorization");
         }
 
-        return fetch(url, {
-          ...options,
-          headers,
-          credentials: "include",
-        });
+        return fetch(url, { ...options, headers, credentials: "include" });
       };
 
-      // First attempt
       let response = await sendRequest(accessToken);
+      if (response.status !== 401) return response;
 
-      if (response.status !== 401) {
-        return response;
-      }
-
-      // Refresh the expired access token.
-      const newToken = await refreshAccessToken();
-
+      const newToken = await refreshSession();
       if (!newToken) {
+        clearAuth();
         return response;
       }
 
       // Retry the original request exactly once.
       response = await sendRequest(newToken);
-
-      if (response.status === 401) {
-        clearAuth();
-      }
+      if (response.status === 401) clearAuth();
 
       return response;
     },
-    [accessToken, refreshAccessToken, clearAuth],
+    [accessToken, refreshSession, clearAuth],
   );
 
   return (
@@ -188,7 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setAuth,
         clearAuth,
         apiFetch,
-        statusCode
+        statusCode,
       }}
     >
       {children}

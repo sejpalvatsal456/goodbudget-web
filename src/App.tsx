@@ -11,50 +11,34 @@ import { YourAccounts } from "./components/YourAccounts";
 import { BudgetCta } from "./components/BudgetCta";
 import { useAccount } from "./hooks/useAccounts";
 import { useTransactions } from "./hooks/useTransactions";
-import { useNavigate } from "react-router-dom";
 
 /* ------------------------------- Sample data ------------------------------- */
 // Replace these with data from your API.
 
 export default function App() {
-  const { user, isInitializing, apiFetch, statusCode } = useAuth();
+  const { user, isInitializing, apiFetch } = useAuth();
   const { loadingAccounts, accounts } = useAccount();
   const { loadingTransactions, transactions } = useTransactions();
-  const navigate = useNavigate();
 
   const [active, setActive] = useState("Home");
   const name = user?.user_name ?? "there";
 
   useEffect(() => {
-    if(statusCode === 401) {
-      navigate("/login")
-    }
-    if (isInitializing) return;
-    if (!user) return;
+    if (isInitializing || !user) return;
     const getBalance = async () => {
       try {
         const res = await apiFetch("/accounts");
         const data = await res.json();
         if (!res.ok) {
-          console.log(data.msg);
+          alert(data.msg);
           return;
         }
-        console.log(data);
       } catch (error) {
-        console.log(error);
+        alert(error);
       }
     };
-    // console.log(statusCode);
     void getBalance();
   }, [user, apiFetch, isInitializing]);
-
-  if (isInitializing) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Restoring your session...
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">

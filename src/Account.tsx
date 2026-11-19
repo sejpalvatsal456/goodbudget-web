@@ -57,37 +57,27 @@ export const AccountPage = () => {
 
   const save = async (values: Omit<Account, "id">) => {
     const id = drawer?.id;
-    console.log(id);
 
     // If id is undefined, we have to create the account and if it is in present, then we have to update it
 
     if (id === undefined) {
-      console.log(values);
       const payload = {
         acc_name: values.name,
         acc_type: values.type,
         acc_balance: values.balance,
       };
-      console.log(payload);
-      if (!user || isInitializing) {
-        console.log("User data isn't set.");
-      }
       const res = await apiFetch("/accounts/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      console.log(await res.json());
     } else {
-      console.log(values);
       const payload = {
         acc_id: id,
         acc_name: values.name,
         acc_type: values.type.toLowerCase(),
         acc_is_disabled: values.isDisabled
       };
-      console.log("Payload: ")
-      console.log(payload);
       const res = await apiFetch("/accounts", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -95,12 +85,11 @@ export const AccountPage = () => {
       });
 
       const data = await res.json();
+      // TODO: make a system that send these appropriate msg to user instead of simple alerts
       if(!res.ok) {
-        console.log(data.msg);
+        alert(data.msg);
         return;
       }
-      console.log("Data from API: ");
-      console.log(data);
     }
 
     setFilteredAccounts((list) =>

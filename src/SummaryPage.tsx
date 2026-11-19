@@ -137,8 +137,6 @@ export const SummaryPage = () => {
       });
 
       const data = await res.json();
-      // console.log(data);
-      // console.log(data.categorywiseExpenseResult);
       setExpenseData(data.categorywiseExpenseResult);
       setIncomeData(data.categorywiseIncomeResult);
       setTotalExpense(data.result.total_value_of_expense);
@@ -150,20 +148,16 @@ export const SummaryPage = () => {
       });
 
       const weekwiseData = await weekwiseRes.json();
-      // console.log(weekwiseData);
       setWeekwiseData(weekwiseData.result);
       const acc_id = "978e1866-98fd-4a25-9f4f-a75b045fe92d";
       const accountwiseUrl = `/summary/accounts?start_date=${start_date.toISOString()}&end_date=${end_date.toISOString()}&acc_id=${acc_id}`;
       const accountwiseRes = await apiFetch(accountwiseUrl, { method: "GET" });
       const accountwiseData = await accountwiseRes.json();
-      // console.log(accountwiseData);
       setAccountwiseData(accountwiseData.result);
     };
 
     void fetchData();
   }, [user, isInitializing, apiFetch]);
-
-  useEffect(() => console.log(accountwiseData), [accountwiseData]);
 
   return (
     <div className="flex min-h-screen bg-[#fffdfd] font-sans text-ink">

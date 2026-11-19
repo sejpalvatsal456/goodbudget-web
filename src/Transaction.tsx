@@ -35,14 +35,11 @@ const TransactionPage = () => {
 
   useEffect(() => {
     if (loadingTransactions) return;
-    // console.log("Transactions from API: ");
-    // console.log(transactions);
   }, [transactions, loadingTransactions]);
 
   // TODO add category filter
   useEffect(() => {
     if (loadingTransactions) return;
-    console.log(filters);
     const newTransactions = transactions
       .filter(
         (t) =>
@@ -58,7 +55,6 @@ const TransactionPage = () => {
       .filter((t) => filters.status === "all" || t.status === filters.status)
       .filter((t) => filters.type === "all" || t.type === filters.type);
     setFilteredTransactions(newTransactions);
-    // console.log(newTransactions);
   }, [filters, transactions]);
 
   const handleSubmit = async (
@@ -94,7 +90,7 @@ const TransactionPage = () => {
     const data = await res.json();
 
     if(!data.ok) {
-      console.log(data.msg);
+      alert(data.msg);
       return;
     }
 
@@ -116,10 +112,9 @@ const TransactionPage = () => {
 
     const data = await res.json();
     if (!res.ok) {
-      console.log(data.msg);
+      alert(data.msg);
       return;
     }
-    console.log(data);
     setFilteredTransactions((list) => list.filter((t) => t.id !== id));
     setDrawer(null);
   };

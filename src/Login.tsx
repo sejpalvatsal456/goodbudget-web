@@ -13,7 +13,7 @@ import {
 import { useAuth, type User } from "./components/AuthContext";
 import financeIllustation from "./assets/goodbudget-finance-illustration.svg";
 import Logo from "./components/Logo";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -41,11 +41,11 @@ const fieldClass =
 
 const inputClass =
   "min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-[#8b91a9] sm:text-base";
-const focusRing =
+const focusRing = 
   "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-coral/40";
 
 export default function Login({ onSuccess }: LoginProps) {
-  const { setAuth } = useAuth();
+  const { setAuth, user } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,9 +54,9 @@ export default function Login({ onSuccess }: LoginProps) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  
   const callback = searchParams.get("callback");
-  console.log(callback);
+  if (user) return <Navigate to={callback || "/"} replace />;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -92,7 +92,6 @@ export default function Login({ onSuccess }: LoginProps) {
         );
       }
 
-      console.log(data.user)
 
       setAuth(data.accessToken, data.user);
       onSuccess?.(data.user);
@@ -226,7 +225,7 @@ export default function Login({ onSuccess }: LoginProps) {
           <button
             type="submit"
             disabled={loading}
-            className={`flex h-s w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-coral text-[19px] font-medium text-white transition hover:bg-coral-dark active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70 sm:h-16 ${focusRing}`}
+            className={`flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-coral text-[19px] font-medium text-white transition hover:bg-coral-dark active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70 sm:h-16 ${focusRing}`}
           >
             {loading ? (
               "Logging in…"
